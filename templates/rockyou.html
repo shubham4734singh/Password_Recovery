@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RockYou Dictionary Attack</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 2rem auto;
+            max-width: 800px;
+        }
+        
+        .nav-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .nav-back {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-back:hover {
+            color: #f8f9fa;
+            transform: translateX(-5px);
+        }
+        
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: rgba(118, 75, 162, 0.05);
+        }
+        
+        .upload-area.dragover {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+        
+        .file-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .progress-container {
+            display: none;
+            margin: 2rem 0;
+        }
+        
+        .progress {
+            height: 25px;
+            border-radius: 15px;
+            background: #e9ecef;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 15px;
+        }
+        
+        .status-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-custom {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-danger-custom {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .result-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .result-error {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .password-display {
+            font-size: 2rem;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            display: inline-block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .rockyou-info {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <!-- Navigation Header -->
+            <div class="nav-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="/" class="nav-back">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Home
+                    </a>
+                    <h4 class="mb-0">
+                        <i class="fas fa-book me-2"></i>RockYou Dictionary Attack
+                    </h4>
+                    <div></div> <!-- Spacer for centering -->
+                </div>
+            </div>
+
+            <div class="p-4">
+                <!-- RockYou Info -->
+                <div class="rockyou-info">
+                    <h5><i class="fas fa-info-circle me-2"></i>About RockYou Dictionary</h5>
+                    <p class="mb-0">The RockYou password list contains 14+ million real-world passwords from a 2009 data breach. 
+                    This dictionary attack tries the most common passwords first, making it highly effective for typical passwords.</p>
+                </div>
+
+                <!-- File Upload Section -->
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                    <h4>Upload Your File</h4>
+                    <p class="text-muted">Drag and drop your PDF, ZIP, 7Z, TAR, or RAR file here, or click to browse</p>
+                    <input type="file" id="fileInput" accept=".pdf,.zip,.7z,.tar,.rar" style="display: none;">
+                    <button class="btn btn-custom" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open me-2"></i>Choose File
+                    </button>
+                </div>
+
+                <!-- File Info -->
+                <div class="file-info" id="fileInfo">
+                    <h5><i class="fas fa-file me-2"></i>Selected File</h5>
+                    <p id="fileName" class="mb-0"></p>
+                </div>
+
+                <!-- Start Button -->
+                <div class="text-center">
+                    <button class="btn btn-custom btn-lg" id="startBtn" onclick="startRockYouAttack()">
+                        <i class="fas fa-play me-2"></i>Start RockYou Attack
+                    </button>
+                </div>
+
+                <!-- Progress Section -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="card status-card">
+                        <div class="card-body text-center">
+                            <div class="spinner mx-auto mb-3"></div>
+                            <h5 id="statusText">Starting RockYou dictionary attack...</h5>
+                            <div class="progress mb-3">
+                                <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <p class="text-muted" id="progressText">Trying password: password</p>
+                            <button class="btn btn-danger-custom" onclick="stopCracking()">
+                                <i class="fas fa-stop me-2"></i>Stop Attack
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="resultsContainer" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentFile = null;
+        let statusInterval = null;
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            const allowedTypes = ['application/pdf', 'application/zip', 'application/x-7z-compressed', 'application/x-tar', 'application/x-rar-compressed'];
+            const allowedExtensions = ['.pdf', '.zip', '.7z', '.tar', '.rar'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            
+            if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+                alert('Please select a PDF, ZIP, 7Z, TAR, or RAR file.');
+                return;
+            }
+
+            currentFile = file;
+            fileName.textContent = file.name;
+            fileInfo.style.display = 'block';
+        }
+
+        // RockYou attack functionality
+        function startRockYouAttack() {
+            if (!currentFile) {
+                alert('Please select a file first.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', currentFile);
+            formData.append('attack_type', 'rockyou');
+
+            // Show progress
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('startBtn').disabled = true;
+
+            fetch('/upload_rockyou', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    hideProgress();
+                } else {
+                    startStatusPolling();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while uploading the file.');
+                hideProgress();
+            });
+        }
+
+        function startStatusPolling() {
+            statusInterval = setInterval(() => {
+                fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateProgress(data);
+                    
+                    if (!data.is_running) {
+                        clearInterval(statusInterval);
+                        showResults(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    clearInterval(statusInterval);
+                    hideProgress();
+                });
+            }, 1000);
+        }
+
+        function updateProgress(data) {
+            const statusText = document.getElementById('statusText');
+            const progressText = document.getElementById('progressText');
+            const progressBar = document.getElementById('progressBar');
+
+            if (data.error) {
+                statusText.textContent = 'Error: ' + data.error;
+                return;
+            }
+
+            if (data.found_password) {
+                statusText.textContent = 'Password Found!';
+                progressText.textContent = `Password: ${data.found_password}`;
+                progressBar.style.width = '100%';
+            } else if (data.is_running) {
+                statusText.textContent = 'RockYou dictionary attack in progress...';
+                progressText.textContent = `Trying: ${data.current_password}`;
+                
+                // Calculate progress percentage
+                const current = data.current_attempt || 0;
+                const total = data.total_attempts || 1;
+                const percentage = Math.min((current / total) * 100, 100);
+                progressBar.style.width = percentage + '%';
+            } else {
+                statusText.textContent = 'Password not found in RockYou dictionary';
+            }
+        }
+
+        function showResults(data) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            if (data.found_password) {
+                resultsContainer.innerHTML = `
+                    <div class="result-success">
+                        <i class="fas fa-check-circle fa-3x mb-3"></i>
+                        <h3>🎉 Password Found!</h3>
+                        <div class="password-display">${data.found_password}</div>
+                        <p class="text-success"><i class="fas fa-check-circle me-2"></i>Password cracked using RockYou dictionary!</p>
+                        <div class="mt-3">
+                            <button class="btn btn-custom me-2" onclick="downloadFile('${currentFile.name}')">
+                                <i class="fas fa-download me-2"></i>Download Original File
+                            </button>
+                            <button class="btn btn-success" onclick="downloadUnlockedFile()">
+                                <i class="fas fa-unlock me-2"></i>Download Unlocked File
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="result-error">
+                        <i class="fas fa-times-circle fa-3x mb-3"></i>
+                        <h3>Password Not Found</h3>
+                        <p>The password was not found in the RockYou dictionary.</p>
+                        <p>Try using the Numerical Password option or Custom Password List for more targeted attacks.</p>
+                    </div>
+                `;
+            }
+            
+            resultsContainer.style.display = 'block';
+            hideProgress();
+        }
+
+        function hideProgress() {
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        function stopCracking() {
+            fetch('/stop')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Attack stopped');
+                hideProgress();
+            })
+            .catch(error => {
+                console.error('Error stopping:', error);
+            });
+        }
+
+        function downloadFile(filename) {
+            window.open(`/download/${filename}`, '_blank');
+        }
+
+        function downloadUnlockedFile() {
+            // Get the unlocked file path from the status
+            fetch('/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.unlocked_file_path) {
+                    const filename = data.unlocked_file_path.split('/').pop();
+                    window.open(`/download_unlocked/${filename}`, '_blank');
+                } else {
+                    alert('Unlocked file not available');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error downloading unlocked file');
+            });
+        }
+    </script>
+</body>
+</html> 

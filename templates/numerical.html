@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Numerical Password Cracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .main-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin: 2rem auto;
+            max-width: 800px;
+        }
+        
+        .nav-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem 2rem;
+            border-radius: 20px 20px 0 0;
+        }
+        
+        .nav-back {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-back:hover {
+            color: #f8f9fa;
+            transform: translateX(-5px);
+        }
+        
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .upload-area:hover {
+            border-color: #764ba2;
+            background: rgba(118, 75, 162, 0.05);
+        }
+        
+        .upload-area.dragover {
+            border-color: #28a745;
+            background: rgba(40, 167, 69, 0.1);
+        }
+        
+        .file-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .progress-container {
+            display: none;
+            margin: 2rem 0;
+        }
+        
+        .progress {
+            height: 25px;
+            border-radius: 15px;
+            background: #e9ecef;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 15px;
+        }
+        
+        .status-card {
+            border-radius: 15px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-custom {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-outline-custom {
+            border-color: #667eea;
+            color: #667eea;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .btn-outline-custom:hover, .btn-outline-custom.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .btn-danger-custom {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .result-success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .result-error {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+            color: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        
+        .password-display {
+            font-size: 2rem;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            display: inline-block;
+        }
+        
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .range-inputs {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .feature-highlight {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-container">
+            <div class="nav-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <a href="/" class="nav-back">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Home
+                    </a>
+                    <h4 class="mb-0">
+                        <i class="fas fa-calculator me-2"></i>Numerical Password Cracker
+                    </h4>
+                    <div></div> </div>
+            </div>
+
+            <div class="p-4">
+                <div class="feature-highlight">
+                    <h5><i class="fas fa-bolt me-2"></i>Smart Optimization</h5>
+                    <p class="mb-0">Tries 200+ common numeric patterns first for lightning-fast results!</p>
+                </div>
+
+                <div class="upload-area" id="uploadArea">
+                    <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                    <h4>Upload Your File</h4>
+                    <p class="text-muted">Drag and drop your PDF, ZIP, 7Z, TAR, or RAR file here, or click to browse</p>
+                    <input type="file" id="fileInput" accept=".pdf,.zip,.7z,.tar,.rar" style="display: none;">
+                    <button class="btn btn-custom" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-folder-open me-2"></i>Choose File
+                    </button>
+                </div>
+
+                <div class="file-info" id="fileInfo">
+                    <h5><i class="fas fa-file me-2"></i>Selected File</h5>
+                    <p id="fileName" class="mb-0"></p>
+                </div>
+
+                <div class="range-inputs">
+                    <h5><i class="fas fa-cog me-2"></i>Password Range</h5>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Quick Select Length:</label>
+                        <div class="btn-group" role="group" id="quickSelectGroup">
+                            <button type="button" class="btn btn-outline-custom" onclick="selectLength(4)">4 Digits</button>
+                            <button type="button" class="btn btn-outline-custom" onclick="selectLength(6)">6 Digits</button>
+                            <button type="button" class="btn btn-outline-custom" onclick="selectLength(8)">8 Digits</button>
+                            <button type="button" class="btn btn-outline-custom" onclick="selectLength(10)">10 Digits</button>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <label for="minDigits" class="form-label">Minimum Digits</label>
+                            <input type="number" class="form-control" id="minDigits" value="4" min="0" max="10">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="maxDigits" class="form-label">Maximum Digits</label>
+                             <input type="number" class="form-control" id="maxDigits" value="6" min="0" max="10">
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="fas fa-info-circle me-1"></i>
+                            Range: <span id="rangeInfo">4 to 6 digits</span>
+                        </small>
+                        <br>
+                        <small class="text-success">
+                            <i class="fas fa-bolt me-1"></i>
+                            <strong>Optimized:</strong> Tries common passwords first for faster results!
+                        </small>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button class="btn btn-custom btn-lg" id="startBtn" onclick="startCracking()">
+                        <i class="fas fa-play me-2"></i>Start Numerical Cracking
+                    </button>
+                </div>
+
+                <div class="progress-container" id="progressContainer">
+                    <div class="card status-card">
+                        <div class="card-body text-center">
+                            <div class="spinner mx-auto mb-3"></div>
+                            <h5 id="statusText">Starting password crack...</h5>
+                            <div class="progress mb-3">
+                                <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <p class="text-muted" id="progressText">Trying password: 0000</p>
+                            <button class="btn btn-danger-custom" onclick="stopCracking()">
+                                <i class="fas fa-stop me-2"></i>Stop Cracking
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="resultsContainer" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let currentFile = null;
+        let statusInterval = null;
+
+        // File upload handling
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        function handleFileSelect(file) {
+            const allowedTypes = ['application/pdf', 'application/zip', 'application/x-7z-compressed', 'application/x-tar', 'application/x-rar-compressed'];
+            const allowedExtensions = ['.pdf', '.zip', '.7z', '.tar', '.rar'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            
+            if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
+                alert('Please select a PDF, ZIP, 7Z, TAR, or RAR file.');
+                return;
+            }
+
+            currentFile = file;
+            fileName.textContent = file.name;
+            fileInfo.style.display = 'block';
+            updateRangeInfo();
+        }
+
+        // Range input handling
+        const minDigits = document.getElementById('minDigits');
+        const maxDigits = document.getElementById('maxDigits');
+        const rangeInfo = document.getElementById('rangeInfo');
+
+        function updateRangeInfo() {
+            const min = parseInt(minDigits.value);
+            const max = parseInt(maxDigits.value);
+            
+            if (min > max) {
+                rangeInfo.textContent = 'Invalid range (min > max)';
+                return;
+            }
+
+            // Deactivate all quick select buttons
+            document.querySelectorAll('#quickSelectGroup .btn').forEach(btn => btn.classList.remove('active'));
+            // Activate the matching quick select button if min === max
+            if (min === max) {
+                const matchingButton = document.querySelector(`#quickSelectGroup .btn[onclick="selectLength(${min})"]`);
+                if (matchingButton) {
+                    matchingButton.classList.add('active');
+                }
+            }
+
+            let totalCombinations = 0;
+            for (let i = min; i <= max; i++) {
+                totalCombinations += Math.pow(10, i);
+            }
+
+            rangeInfo.textContent = `${min} to ${max} digits (${totalCombinations.toLocaleString()} combinations)`;
+        }
+
+        minDigits.addEventListener('input', updateRangeInfo);
+        maxDigits.addEventListener('input', updateRangeInfo);
+
+        // NEW: Function for quick select buttons
+        function selectLength(length) {
+            minDigits.value = length;
+            maxDigits.value = length;
+            updateRangeInfo();
+        }
+
+        // Password cracking functionality
+        function startCracking() {
+            if (!currentFile) {
+                alert('Please select a file first.');
+                return;
+            }
+
+            const min = parseInt(minDigits.value);
+            const max = parseInt(maxDigits.value);
+
+            if (min > max) {
+                alert('Minimum digits cannot be greater than maximum digits.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', currentFile);
+            formData.append('min_digits', min);
+            formData.append('max_digits', max);
+
+            // Show progress
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('startBtn').disabled = true;
+
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    hideProgress();
+                } else {
+                    startStatusPolling();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while uploading the file.');
+                hideProgress();
+            });
+        }
+
+        function startStatusPolling() {
+            statusInterval = setInterval(() => {
+                fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    updateProgress(data);
+                    
+                    if (!data.is_running) {
+                        clearInterval(statusInterval);
+                        showResults(data);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    clearInterval(statusInterval);
+                    hideProgress();
+                });
+            }, 1000);
+        }
+
+        function updateProgress(data) {
+            const statusText = document.getElementById('statusText');
+            const progressText = document.getElementById('progressText');
+            const progressBar = document.getElementById('progressBar');
+
+            if (data.error) {
+                statusText.textContent = 'Error: ' + data.error;
+                return;
+            }
+
+            if (data.found_password) {
+                statusText.textContent = 'Password Found!';
+                progressText.textContent = `Password: ${data.found_password}`;
+                progressBar.style.width = '100%';
+            } else if (data.is_running) {
+                statusText.textContent = 'Cracking password...';
+                progressText.textContent = `Trying: ${data.current_password}`;
+                
+                // Calculate progress percentage
+                const current = parseInt(data.current_password) || 0;
+                const total = data.total_attempts || 1;
+                const percentage = Math.min((current / total) * 100, 100);
+                progressBar.style.width = percentage + '%';
+            } else {
+                statusText.textContent = 'Password not found in given range';
+            }
+        }
+
+        function showResults(data) {
+            const resultsContainer = document.getElementById('resultsContainer');
+            
+            if (data.found_password) {
+                resultsContainer.innerHTML = `
+                    <div class="result-success">
+                        <i class="fas fa-check-circle fa-3x mb-3"></i>
+                        <h3>🎉 Password Found!</h3>
+                        <div class="password-display">${data.found_password}</div>
+                        <p class="text-success"><i class="fas fa-check-circle me-2"></i>Password cracked successfully!</p>
+                        <div class="mt-3">
+                            <button class="btn btn-custom me-2" onclick="downloadFile('${currentFile.name}')">
+                                <i class="fas fa-download me-2"></i>Download Original File
+                            </button>
+                            <button class="btn btn-success" onclick="downloadUnlockedFile()">
+                                <i class="fas fa-unlock me-2"></i>Download Unlocked File
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                resultsContainer.innerHTML = `
+                    <div class="result-error">
+                        <i class="fas fa-times-circle fa-3x mb-3"></i>
+                        <h3>Password Not Found</h3>
+                        <p>The password was not found within the specified range.</p>
+                        <p>Try increasing the maximum number of digits or check if the password contains non-numeric characters.</p>
+                    </div>
+                `;
+            }
+            
+            resultsContainer.style.display = 'block';
+            hideProgress();
+        }
+
+        function hideProgress() {
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('startBtn').disabled = false;
+        }
+
+        function stopCracking() {
+            fetch('/stop')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Cracking stopped');
+                hideProgress();
+            })
+            .catch(error => {
+                console.error('Error stopping:', error);
+            });
+        }
+
+        function downloadFile(filename) {
+            window.open(`/download/${filename}`, '_blank');
+        }
+
+        function downloadUnlockedFile() {
+            // Get the unlocked file path from the status
+            fetch('/status')
+            .then(response => response.json())
+            .then(data => {
+                if (data.unlocked_file_path) {
+                    const filename = data.unlocked_file_path.split('/').pop();
+                    window.open(`/download_unlocked/${filename}`, '_blank');
+                } else {
+                    alert('Unlocked file not available');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error downloading unlocked file');
+            });
+        }
+
+        // Initialize
+        updateRangeInfo();
+    </script>
+</body>
+</html>
