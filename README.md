@@ -76,8 +76,8 @@ This tool is intended for **legitimate use only**:
 ## 🔧 Configuration
 
 ### File Size Limits
-- Maximum file size: 16MB
-- Adjust in `app.py` line 12: `app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024`
+- Maximum file size: 32MB
+- Adjust in `app.py` line 12: `app.config['MAX_CONTENT_LENGTH'] = 32 * 1024 * 1024`
 
 ### Password Range Limits
 - Minimum: 1 digit
