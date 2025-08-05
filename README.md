@@ -183,4 +183,4 @@ Feel free to submit issues, feature requests, or pull requests to improve this t
 
 ---
 
-**Remember**: Only use this tool on files you own or have explicit permission to access. 
+**Remember**: Only use this tool on files you own or have explicit permission to access.
