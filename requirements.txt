@@ -1,5 +1,5 @@
-Flask==2.3.3
-pikepdf==8.6.2
-Werkzeug==2.3.7
-py7zr==0.20.8
-rarfile==4.0 
+Flask
+pikepdf
+Werkzeug
+py7zr
+rarfile
