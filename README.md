@@ -1,4 +1,4 @@
-# PDF/ZIP Password Cracker
+# PDF/ZIP Password Recovery
 # http://passwordrecovery-production.up.railway.app
 ## 🤝 Contributer https://github.com/Sachinpd-1703
 
@@ -35,7 +35,7 @@ This tool is intended for **legitimate use only**:
 1. **Clone or download this repository**
    ```bash
    git clone <repository-url>
-   cd PDF
+   cd Password_Recovery
    ```
 
 2. **Install Python dependencies**
